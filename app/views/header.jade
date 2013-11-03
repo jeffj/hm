@@ -1,0 +1,11 @@
+header
+  if (typeof username=="undefined")
+   a(href="/") Home
+   | &nbsp;
+   a(href="/login") Login
+   | &nbsp;
+   a(href="/signup") Signup
+  else
+   span=username
+   | &nbsp;
+   a(href="/logout") Logout

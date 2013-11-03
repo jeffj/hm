@@ -1,0 +1,30 @@
+extends ../layout
+
+block main
+  h1= title
+block styles
+  link(rel='stylesheet', href='../stylesheets/board.css')
+block content
+  .main-auth
+    .loginOptions
+      div
+        a(href="/auth/github") 
+          |Login With GitHub
+          br
+          img(src="../images/git.png")
+        | &nbsp;
+      div
+        a(href="/auth/twitter") 
+          | Login With Twitter
+          br
+          img(src="../images/twitter.png")
+
+    .auth-box
+      if (typeof errors !== 'undefined')
+        .fade.in.alert.alert-block.alert-error
+          a.close(data-dismiss="alert", href="javascript:void(0)") x
+          ul
+            each error in errors
+              li= error.type
+
+      block auth
