@@ -10,8 +10,9 @@
   }
   var parseResults,
       mongoose = require('mongoose'),
-      Post = mongoose.model('Post'),
-      Parse = require('./parseUtils');
+      Parse = require('./parseUtils'),
+      Address = mongoose.model('Address'),
+      _ = require('underscore');
 
   //------------------------------
   // List
@@ -22,18 +23,31 @@
       model
         .find({})
         .populate("user", "username")
+        .populate("addressObj")
         .sort("createdAt")
         .lean()
         .exec(function (err, result) {
         if (!err) {
           var json;
           json=parseResults(result, req.user); //adds a myPost key for the post the user ownes
+
+          json=markFlattener(json);
+
           res.send(json);
         } else {
           res.send(errMsg(err));
         }
       });
     };
+  }
+
+  var markFlattener = function(json){
+    return _.map(json, function(obj){ 
+            obj.url=obj['addressObj'].url; 
+            obj.url_title=obj['addressObj'].title 
+            delete obj['addressObj']; 
+            return obj;
+    });
   }
 
   parseResults = function(result, user){ //Check if the logged in user is the author.
@@ -52,8 +66,9 @@
   //
   exports.getCreateController=function(model) {
     return function (req, res) {
-      var m = new model(req.body);
+      var m = new model(req.body), address;
       m.user=req.user._id;
+      m.original_url=req.body.url;
 
       var getCreateControllerActions = [
         function () {
@@ -63,27 +78,41 @@
             /* code for step 2 */
             getCreateControllerCallback();
         }, function () {
-            /* code for step 3 */
-            getCreateControllerCallback();
-        }, function () {
-            /* code for step 4 */
-            getCreateControllerCallback();
+            var canconical_url=Parse.canconicalURL(req.body.url);
+            Address.findOne({url: canconical_url})
+            .exec(function(err, addressResObj){
+
+              if (addressResObj)
+                m.addressObj=addressResObj._id, address=addressResObj;
+
+              getCreateControllerCallback();
+            });
         }, function(){
+          if (!m.addressObj){
+            Parse.parser(req.body.url, function(err, urlResObj){
 
-            Parse.parser(m.title, function(err, urlResObj){
+              address = new Address({url:urlResObj.canonical_url, title: urlResObj.title });
+              address.save(function(){
+                m.addressObj = address;
+                getCreateControllerCallback();
+              });
 
-            m.title=urlResObj.title;
-
-            getCreateControllerCallback();
 
             });
+          }else{
+            getCreateControllerCallback();            
+          }
             /* code for step 5 */
+        }, function () {
+            getCreateControllerCallback();
         }, function () {
 
             m.save(function (err) {
               if (!err) {
-                var sender=m.toJSON()
+                var sender=m.toJSON();
+                sender.addressObj= address.toJSON();
                 sender.user={username:req.user.username};
+                sender=markFlattener([sender])[0];
                 res.send(sender);
               } else {
                 res.send(errMsg(err));
@@ -124,9 +153,6 @@
   //
    exports.getReadController=function(model) {
     return function (req, res) {
-
-      //console.log(req.post);
-
       
       // model.findById(req.params.id, function (err, result) {
         if (req.post) {
@@ -175,24 +201,16 @@
           });
     };
   }
-  exports.postid = function (req, res, next, id){  //param function for wildcard :id of url
-    Post.load(id, function (err, post) {
-      if (err) return next(err)
-      if (!post) return next(new Error('Failed to load article ' + id))
-      req.post = post
-      next()
-    })
-  }
+  // exports.postid = function (req, res, next, id){  //param function for wildcard :id of url
+  //   Post.load(id, function (err, post) {
+  //     if (err) return next(err)
+  //     if (!post) return next(new Error('Failed to load article ' + id))
+  //     req.post = post
+  //     next()
+  //   })
+  // }
 
-  exports.idParse = function (req, res, next, id){  //param function for wildcard :id of url
-    Post.load(id, function (err, post) {
-      if (err) return next(err)
-      if (!post) return res.render('404',{title:'404',error: 'No Post'});
-      req.post = post
-      next()
-    })
 
-  }
 
 
 }(exports));

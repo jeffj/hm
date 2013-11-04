@@ -7,7 +7,6 @@ $(function ($, _, Backbone) {
   // Post Model
   // ----------
 
-  // Our basic **post** model has `title`, `order`, and `done` attributes.
   Post = Backbone.Model.extend({
 
     // MongoDB uses _id as default primary key
@@ -16,15 +15,15 @@ $(function ($, _, Backbone) {
     // Default attributes for the post item.
     defaults: function () {
       return {
-        title: "empty post..."
-        , done: false
+        title: "Pending..."
+        , url: ""
       };
     },
 
     // Ensure that each post created has `title`.
     initialize: function () {
-      if (!this.get("title")) {
-        this.set({"title": this.defaults.title});
+      if (!this.get("url")) {
+        this.set({"url": this.defaults.title});
       }
     },
     // timeago:function(){
@@ -65,7 +64,6 @@ $(function ($, _, Backbone) {
 
     // The DOM events specific to an item.
     events: {
-       "click .toggle"   : "toggleDone",
        "click .edit"  : "edit",
        "click a.destroy" : "clear",
         "click .submit-update"  : "update",
@@ -82,7 +80,7 @@ $(function ($, _, Backbone) {
     // Re-render the titles of the post item.
     render: function () {
       var JSON=this.model.toJSON()
-      JSON.timeAgo=$.timeago(this.model.get("createdAt"))
+      JSON.timeAgo= this.model.get("createdAt")? $.timeago(this.model.get("createdAt")):"";
       this.$el.html(this.template(JSON));
       this.input = this.$('.edit');
       this.bodyEdit = this.$(".body-edit")
@@ -90,10 +88,6 @@ $(function ($, _, Backbone) {
       return this;
     },
 
-    // Toggle the `"done"` state of the model.
-    toggleDone: function () {
-      this.model.toggle();
-    },
     // If you hit `enter`, we're through editing the item.
     update: function (e) {
         var valuetitle = this.titleEdit.val().trim();
@@ -130,7 +124,7 @@ $(function ($, _, Backbone) {
 
     // Delegated events for creating new items, and clearing completed ones.
     events: {
-      "keypress #new-post-title":  "createOnEnter",
+      "keypress #new-mark-url":  "createOnEnter",
      // "click #clear-completed": "clearCompleted",
       //"click #toggle-all": "toggleAllComplete"
       "click .submit"  : "create"
@@ -141,8 +135,7 @@ $(function ($, _, Backbone) {
     // collection, when items are added or changed. Kick things off by
     // loading any preexisting post.
     initialize: function () {
-      this.inputTitle = this.$("#new-post-title");
-      this.inputBody = this.$("#new-post-body");
+      this.inputURL = this.$("#new-mark-url");
       Posts.bind('add', this.addOne, this);
       Posts.bind('reset', this.addAll, this);
       Posts.bind('all', this.render, this);
@@ -178,13 +171,17 @@ $(function ($, _, Backbone) {
     // If you hit return in the main input field, create new **Post** model
     createOnEnter: function (e) {
       if (e.keyCode !== 13) { return; }
-      if (!this.inputTitle.val()) { return; }
+      if (!this.inputURL.val()) { return; }
       create();
     },
     create:function(){
-      Posts.create({createdAt:new Date(), title: this.inputTitle.val(),body: this.inputBody.val(), myPost:true, user: {username:"jeffj"}});
-      this.inputTitle.val('');
-      this.inputBody.val('');
+      Posts.create({
+        url: this.inputURL.val(),
+        myPost:true,
+        user: {username:username}
+
+      });
+      this.inputURL.val('');
     }
     // toggleAllComplete: function () {
     //   var done = this.allCheckbox.checked;

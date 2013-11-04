@@ -12,7 +12,7 @@ block content
       br
       .form-box
         if (typeof username!="undefined") 
-            input#new-post-title(type="text", placeholder="Title")
+            input#new-mark-url(type="text", placeholder="Title", value="http://www.nytimes.com/2013/10/29/science/algorithm-can-identify-dolphin-whistles.html?src=recg&gwh=C0C96C891D4AE3EDB3FC276F35A11D6E")
             button.submit(href="javascript:null;")
               | Submit
         else
@@ -36,7 +36,8 @@ block bodyscripts
     |  <a class="destroy" href="javascript:null;" class="destroy">&#10006;</a>
     |  <% } %> 
     |  </div> 
-    |  <h3 class="title" ><%= title %></h3>
+    |  <h2 class="title" ><%= title %></h2>
+    |  <h3 class="url" ><%= url %></h3>
     |  <input class="title-edit" placeholder"Title"></input>
     |  <br>
     |  <div class="bottom-label">

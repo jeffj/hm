@@ -11,7 +11,7 @@ var httpParse = require('http')
 
 exports.parser=function(url, cb){
 
-  var parsed=parseURI(url), parsedURL
+  var parsed=parseURI(url), parsedURL, canonical_url= canconicalURL(url);
 
 
   urlRequest(url, function(err, response, header){
@@ -35,7 +35,7 @@ exports.parser=function(url, cb){
         }else
           favicon=null;
 
-        cb(null, {favicon:favicon, title:title});
+        cb(null, {favicon:favicon, title:title, parsed_uri: parsed, canonical_url: canonical_url});
 
 
       });
@@ -81,7 +81,7 @@ var textScape=function(html, callback){
 
 
 
-canconicalURL=function(parsed){ return parsed.protocol+"://"+parsed.domain+parsed.path.replace(/\/$/g, '');}
+canconicalURL=exports.canconicalURL=function(url){ var parsed=parseURI(url); return parsed.domain+parsed.path.replace(/\/$/g, '');}
 
 parseURI=function(sourceUri){
     var uriPartNames = ["source","protocol","authority","domain","port","path","directoryPath","fileName","query","anchor"],

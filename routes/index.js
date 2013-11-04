@@ -2,7 +2,7 @@
   "use strict";
   var mongoose = require('mongoose')
     , crudUtils = require('../utils/crudUtils')
-    , post = mongoose.model('Post')
+    , Mark = mongoose.model('Mark')
     , users = require('../app/controller/users')
 
   function index(req, res) {
@@ -12,6 +12,17 @@
         , 'userid':(req.user) ?  req.user._id: undefined
       });
   }
+
+  var idParse = function (req, res, next, id){  //param function for wildcard :id of url
+    Mark.load(id, function (err, post) {
+      if (err) return next(err)
+      if (!post) return res.render('404',{title:'404',error: 'No Post'});
+      req.post = post
+      next()
+    })
+
+  }
+
   exports.init = function (app, auth, passport) {
     app.get('/',index);
     app.get('/login', users.login);
@@ -25,20 +36,18 @@
     app.get('/auth/twitter/callback', passport.authenticate('twitter', { failureRedirect: '/login' }), users.authCallback)
 
     app.post('/users/session', passport.authenticate('local', {failureRedirect: '/login', failureFlash: 'Invalid email or password.'}), users.session)
-    
-   // console.log(app);
-   // crudUtils.initRoutesForModel({ 'app': app, 'model': post, auth: auth });
 
-    app.param('id', crudUtils.idParse);
+    app.param('id', idParse);
 
-    app.get('/api', crudUtils.getListController(post));
-    app.get('/api/:id', crudUtils.getReadController(post));
-    app.post('/api', auth.requiresLogin, crudUtils.getCreateController(post));
-    app.put('/api/:id', auth.requiresLogin, auth.post.hasAuthorization, crudUtils.getUpdateController(post));
-    app.del('/api/:id', auth.requiresLogin, auth.post.hasAuthorization, crudUtils.getDeleteController(post));
-    // app.param('id', postid)
+    app.get('/api', crudUtils.getListController(Mark));
+    app.get('/api/:id', crudUtils.getReadController(Mark));
+    app.post('/api', auth.requiresLogin, crudUtils.getCreateController(Mark));
+    app.put('/api/:id', auth.requiresLogin, auth.post.hasAuthorization, crudUtils.getUpdateController(Mark));
+    app.del('/api/:id', auth.requiresLogin, auth.post.hasAuthorization, crudUtils.getDeleteController(Mark));
 
   };
+
+
 
   // exports.initRoutesForModel = function (options) {
   //   var app = options.app,

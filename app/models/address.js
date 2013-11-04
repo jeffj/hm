@@ -2,8 +2,8 @@ var mongoose = require('mongoose')
     Schema = mongoose.Schema;
    postsSchema = new mongoose.Schema({
         title: { 'type': String, 'default': 'empty title...' }
+       , url: { 'type': String, 'default': '' }
        , createdAt : {type : Date, default : Date.now}
-       , user  : { type : Schema.ObjectId, ref : 'User' } 
   });
 
    postsSchema.statics = {
@@ -21,4 +21,4 @@ var mongoose = require('mongoose')
   }
 }
 
-module.exports = mongoose.model('Post', postsSchema);
+module.exports = mongoose.model('Address', postsSchema);
