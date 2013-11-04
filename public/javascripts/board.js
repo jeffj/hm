@@ -15,8 +15,9 @@ $(function ($, _, Backbone) {
     // Default attributes for the post item.
     defaults: function () {
       return {
-        title: "Pending..."
+        title: ""
         , url: ""
+        , url_title: ""
       };
     },
 
@@ -83,18 +84,22 @@ $(function ($, _, Backbone) {
       JSON.timeAgo= this.model.get("createdAt")? $.timeago(this.model.get("createdAt")):"";
       this.$el.html(this.template(JSON));
       this.input = this.$('.edit');
-      this.bodyEdit = this.$(".body-edit")
+      this.listEdit = this.$(".list-edit")
       this.titleEdit = this.$(".title-edit")
+
+
       return this;
     },
 
     // If you hit `enter`, we're through editing the item.
     update: function (e) {
         var valuetitle = this.titleEdit.val().trim();
-        if(valuetitle) {
-          this.model.save({title: valuetitle});
-        }
-        this.$el.removeClass('editing');
+        var valuelist = this.listEdit.val().trim();
+
+        //if(!valuetitle || !valuelist) return;
+        this.model.save({title: valuetitle, list: valuelist});
+        
+        //this.$el.removeClass('editing');
       // if (e.keyCode === 13) {
       //   this.close();
       // }

@@ -9,9 +9,12 @@
     return {'error': {'message': msg.toString()}};
   }
   var parseResults,
+      mapReduceLists,
       mongoose = require('mongoose'),
       Parse = require('./parseUtils'),
       Address = mongoose.model('Address'),
+      User = mongoose.model('User'),
+      Mark = mongoose.model('Mark'),
       _ = require('underscore');
 
   //------------------------------
@@ -61,6 +64,27 @@
     };
     return result
   }
+
+
+ var mapReduceLists=function(userId){
+    var o = {};
+    o.map = function () { emit(this.list, 1) }
+    o.reduce = function (k, vals) { return vals.length }
+    o.query={user:'5275c150ffe0a5572c000002'};
+
+    Mark.mapReduce(o, function (err, results) {
+      console.log(results)
+      User.findOne({_id:userId})
+      .exec(function(err, resultUser){
+
+        resultUser.lists=results;
+        resultUser.save();
+
+      });
+    
+    });
+ };
+
   //------------------------------
   // Create
   //
@@ -176,6 +200,7 @@
         }
         result.save(function (err) {
           if (!err) {
+            mapReduceLists(req.user._id)
             var sender=result.toObject()
             if (req.user.username) sender.user={username:req.user.username};
             res.send(sender);

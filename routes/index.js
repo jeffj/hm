@@ -4,11 +4,13 @@
     , crudUtils = require('../utils/crudUtils')
     , Mark = mongoose.model('Mark')
     , users = require('../app/controller/users')
+    , User = mongoose.model('User');
 
   function index(req, res) {
     res.render('index', { 
-        'title': 'Bulletin Board Demo'
+        'title': 'Hypermarks'
         , 'username':(req.user) ?  req.user.username: undefined
+        , 'lists':(req.user) ?  req.user.lists: undefined
         , 'userid':(req.user) ?  req.user._id: undefined
       });
   }
@@ -48,26 +50,5 @@
   };
 
 
-
-  // exports.initRoutesForModel = function (options) {
-  //   var app = options.app,
-  //     model = options.model,
-  //     auth= options.auth,
-  //     path,
-  //     pathWithId;
-
-  //   if (!app || !model) {
-  //     return;
-  //   }
-
-  //   path = options.path || '/' + model.modelName.toLowerCase();
-  //   pathWithId = path + '/:id';
-  //   app.get(path, getListController(model));
-  //   app.get(pathWithId, getReadController(model));
-  //   app.post(path, auth.requiresLogin, getCreateController(model));
-  //   app.put(pathWithId, auth.requiresLogin, auth.post.hasAuthorization, getUpdateController(model));
-  //   app.del(pathWithId, auth.requiresLogin, auth.post.hasAuthorization, getDeleteController(model));
-  //   app.param('id', postid)
-  // };
 
 }(exports));

@@ -16,6 +16,7 @@ var UserSchema = new Schema({
   email: String,
   username: String,
   provider: String,
+  lists: [{_id:String,value:String}],
   hashed_password: String,
   salt: String,
   facebook: {},
@@ -36,6 +37,20 @@ UserSchema
     this.hashed_password = this.encryptPassword(password)
   })
   .get(function() { return this._password })
+
+
+UserSchema.statics = {
+  /**
+   * Find article by id
+   *
+   * @param {ObjectId} id
+   * @param {Function} cb
+   * @api public
+   */
+  findAndModify: function (query, sort, doc, options, callback) {
+  return this.collection.findAndModify(query, sort, doc, options, callback);
+  }
+}
 
 /**
  * Validations

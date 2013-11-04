@@ -6,6 +6,7 @@ var mongoose = require('mongoose')
        , user  : { type : Schema.ObjectId, ref : 'User' }
        , addressObj : { type : Schema.ObjectId, ref : 'Address' }
        , original_url: { 'type': String }
+       , list: { 'type': String, default : "" }
   });
 
    postsSchema.statics = {
