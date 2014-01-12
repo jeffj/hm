@@ -8,9 +8,10 @@ block header
           | Hypermarks
 block content
     #app
+      #box=JSON.stringify(locals)
       br
       .form-box
-        if (typeof username!="undefined") 
+        if (typeof username!="undefined")
             input#new-mark-url(type="text", placeholder="Title", value="http://www.nytimes.com/2013/10/29/science/algorithm-can-identify-dolphin-whistles.html?src=recg&gwh=C0C96C891D4AE3EDB3FC276F35A11D6E")
             button.submit(href="javascript:null;")
               | Submit
@@ -21,10 +22,10 @@ block content
         br
       section#main
         div#list
-          
+
 block bodyscripts
   script
-    username="#{username}";
+    | username="#{username}"
   script#item-template(type="text/template")
     |<div class="view">
     | <div class="border"></div>
@@ -32,10 +33,10 @@ block bodyscripts
     |  <% if (myPost == true) { %>
     |  <a class="edit" href="javascript:null;" class="destroy">&#9998;</a>
     |  <a class="destroy" href="javascript:null;" class="destroy">&#10006;</a>
-    |  <% } %> 
-    |  </div> 
-    |  <h2 class="title" ><%= title %></h2>
-    |  <h3 class="url_title" ><%= url_title %></h4>
+    |  <% } %>
+    |  </div>
+    |  <h2 class="title"><%= title %></h2>
+    |  <h3 class="url_title" style="color:blue;" ><%= url_title %></h4>
     |  <h3 class="url" ><%= url %></h3>
     |  <input class="title-edit" value="<%= title %>" placeholder"Title"></input>
     |  <input class="list-edit" value="<%= list %>" placeholder"List"></input>
@@ -46,7 +47,7 @@ block bodyscripts
     |  <span class="list" >| <%= list %></span>
 
     |  </div>
-    |  <button href="javascript:null;"class="submit-update">Update</button>  
+    |  <button href="javascript:null;"class="submit-update">Update</button>
     |</div>
   script(type="text/javascript", src="javascripts/board.js")
 block footer
